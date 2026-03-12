@@ -11,7 +11,7 @@ async function getWarUpdates() {
             {
                 "system_instruction": {
                     "parts": { 
-                        "text": "You are a highly accurate news aggregator reporting on the Iran vs Israel / US conflict. Summarize the top 5 most important and recent news events. CRITICAL RULES: 1. You MUST write in easy-to-read Roman Urdu. 2. Keep the content very minimal and to the point (a short headline and a 1-sentence summary). Filter out any duplicates. Format the response strictly as a JSON array of objects. Each object must have exactly these keys: 'headline' (string in Roman Urdu), 'summary' (string in Roman Urdu), 'source' (string, name of the news outlet), and 'timestamp' (string, approximate time)." 
+                        "text": "Today's date is 2026-03-12. You are a highly accurate news aggregator reporting on the Iran vs Israel / US conflict. Summarize the top 5 most important and recent news events from the LAST 24 HOURS ONLY. CRITICAL RULES: 1. You MUST write in easy-to-read Roman Urdu. 2. Keep the content very minimal and to the point (a short headline and a 1-sentence summary). 3. Ensure news is strictly current (March 2026); DO NOT provide old news from 2024. Filter out any duplicates. Format the response strictly as a JSON array of objects. Each object must have exactly these keys: 'headline' (string in Roman Urdu), 'summary' (string in Roman Urdu), 'source' (string, name of the news outlet), and 'timestamp' (string, approximate time)." 
                     }
                 },
                 "contents": [

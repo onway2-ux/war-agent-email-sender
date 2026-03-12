@@ -13,125 +13,151 @@ const transporter = nodemailer.createTransport({
 function generateEmailHTML(updates) {
     let emailContent = `
     <!DOCTYPE html>
-    <html lang="en">
+    <html lang="ur">
     <head>
         <meta charset="UTF-8">
+        <meta name="viewport" content="width=device-width, initial-scale=1.0">
         <style>
+            @import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;600;800&display=swap');
+            
             body {
-                font-family: 'Helvetica Neue', Arial, sans-serif;
-                background-color: #f0f2f5;
-                color: #1c1e21;
+                font-family: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+                background-color: #f8fafc;
+                color: #1e293b;
                 margin: 0;
-                padding: 40px 20px;
+                padding: 0;
                 -webkit-font-smoothing: antialiased;
             }
+            .wrapper {
+                width: 100%;
+                table-layout: fixed;
+                background-color: #f8fafc;
+                padding-top: 40px;
+                padding-bottom: 40px;
+            }
             .container {
-                max-width: 640px;
-                margin: auto;
-                background: #ffffff;
-                border-radius: 16px;
+                max-width: 600px;
+                margin: 0 auto;
+                background-color: #ffffff;
+                border-radius: 12px;
                 overflow: hidden;
-                box-shadow: 0 10px 25px rgba(0,0,0,0.05);
+                box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1), 0 2px 4px -1px rgba(0, 0, 0, 0.06);
             }
             .header {
-                background: linear-gradient(135deg, #1e3c72 0%, #2a5298 100%);
-                padding: 30px;
+                background-color: #0f172a;
+                padding: 32px 24px;
                 text-align: center;
-                color: white;
             }
             .header h1 {
+                color: #f8fafc;
                 margin: 0;
-                font-size: 28px;
-                font-weight: 700;
-                letter-spacing: 0.5px;
+                font-size: 22px;
+                font-weight: 800;
+                letter-spacing: -0.025em;
+                text-transform: uppercase;
             }
             .header p {
-                margin: 10px 0 0;
-                font-size: 15px;
-                opacity: 0.9;
+                color: #94a3b8;
+                margin: 8px 0 0;
+                font-size: 13px;
+                font-weight: 500;
             }
             .content {
-                padding: 30px;
+                padding: 24px;
             }
-            .news-item {
-                margin-bottom: 35px;
-                padding-bottom: 35px;
-                border-bottom: 1px solid #eef0f2;
-                display: flex;
-                flex-direction: column;
-            }
-            .news-item:last-child {
-                border-bottom: none;
-                margin-bottom: 0;
-                padding-bottom: 0;
-            }
-            .news-image {
-                width: 100%;
-                height: 240px;
-                object-fit: cover;
-                border-radius: 12px;
-                margin-bottom: 20px;
-                box-shadow: 0 4px 12px rgba(0,0,0,0.08);
+            .news-card {
+                margin-bottom: 24px;
+                padding: 20px;
+                background-color: #ffffff;
+                border: 1px solid #e2e8f0;
+                border-radius: 8px;
+                transition: transform 0.2s ease;
             }
             .headline {
-                font-size: 24px;
-                font-weight: 800;
-                color: #d32f2f;
-                margin-bottom: 12px;
-                line-height: 1.3;
+                font-size: 17px;
+                font-weight: 700;
+                color: #e11d48;
+                margin-bottom: 8px;
+                line-height: 1.4;
             }
             .summary {
-                font-size: 16px;
+                font-size: 14px;
                 line-height: 1.6;
-                color: #4a4a4a;
-                margin-bottom: 15px;
+                color: #334155;
+                margin-bottom: 16px;
+                font-weight: 400;
             }
             .meta {
                 display: flex;
                 justify-content: space-between;
-                font-size: 13px;
-                color: #888;
-                background: #f8f9fa;
-                padding: 10px 15px;
-                border-radius: 8px;
-                font-weight: 500;
+                align-items: center;
+                border-top: 1px solid #f1f5f9;
+                padding-top: 12px;
+                font-size: 11px;
+                color: #64748b;
+                font-weight: 600;
+                text-transform: uppercase;
+            }
+            .source-tag {
+                background-color: #f1f5f9;
+                padding: 4px 8px;
+                border-radius: 4px;
+                color: #475569;
             }
             .footer {
-                background: #f8f9fa;
-                padding: 20px;
+                padding: 24px;
                 text-align: center;
-                font-size: 13px;
-                color: #777;
-                border-top: 1px solid #eee;
+                background-color: #f1f5f9;
+            }
+            .footer p {
+                margin: 0;
+                font-size: 12px;
+                color: #64748b;
+                font-weight: 500;
+            }
+            @media only screen and (max-width: 600px) {
+                .container {
+                    width: 100% !important;
+                    border-radius: 0 !important;
+                }
+                .header {
+                    padding: 24px 16px;
+                }
+                .headline {
+                    font-size: 16px;
+                }
             }
         </style>
     </head>
     <body>
-        <div class="container">
-            <div class="header">
-                <h1>Iran vs Israel/US Updates</h1>
-                <p>Taza Tareen Khabrain - AI Dawara Tayar Karda</p>
-            </div>
-            <div class="content">
+        <div class="wrapper">
+            <div class="container">
+                <div class="header">
+                    <h1>Iran vs Israel Updates</h1>
+                    <p>Taza Tareen AI Summaries • Roman Urdu Mein</p>
+                </div>
+                <div class="content">
     `;
 
     updates.forEach((update) => {
         emailContent += `
-                <div class="news-item">
-                    <div class="headline">${update.headline}</div>
-                    <div class="summary">${update.summary}</div>
-                    <div class="meta">
-                        <span><strong>Source:</strong> ${update.source}</span>
-                        <span><strong>Waqt:</strong> ${update.timestamp}</span>
+                    <div class="news-card">
+                        <div class="headline">${update.headline}</div>
+                        <div class="summary">${update.summary}</div>
+                        <div class="meta">
+                            <span class="source-tag">${update.source}</span>
+                            <span>${update.timestamp}</span>
+                        </div>
                     </div>
-                </div>
         `;
     });
 
     emailContent += `
-            </div>
-            <div class="footer">
-                🚀 Automated daily update agent • Node.js & AI Powered
+                </div>
+                <div class="footer">
+                    <p>Automated Update Agent • Node.js & Google Gemini</p>
+                    <p style="margin-top: 4px;">Date: 2026-03-12</p>
+                </div>
             </div>
         </div>
     </body>
