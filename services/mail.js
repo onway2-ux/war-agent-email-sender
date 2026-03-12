@@ -11,6 +11,7 @@ const transporter = nodemailer.createTransport({
 });
 
 function generateEmailHTML(updates) {
+    const today = new Date().toLocaleDateString('en-GB', { day: '2-digit', month: 'short', year: 'numeric' });
     let emailContent = `
     <!DOCTYPE html>
     <html lang="ur">
@@ -18,113 +19,107 @@ function generateEmailHTML(updates) {
         <meta charset="UTF-8">
         <meta name="viewport" content="width=device-width, initial-scale=1.0">
         <style>
-            @import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;600;800&display=swap');
+            @import url('https://fonts.googleapis.com/css2?family=Outfit:wght@400;600;800&display=swap');
             
             body {
-                font-family: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
-                background-color: #f8fafc;
-                color: #1e293b;
+                font-family: 'Outfit', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+                background-color: #f1f5f9;
+                color: #0f172a;
                 margin: 0;
                 padding: 0;
-                -webkit-font-smoothing: antialiased;
             }
             .wrapper {
                 width: 100%;
-                table-layout: fixed;
-                background-color: #f8fafc;
-                padding-top: 40px;
-                padding-bottom: 40px;
+                background-color: #f1f5f9;
+                padding: 40px 10px;
             }
             .container {
-                max-width: 600px;
+                max-width: 520px;
                 margin: 0 auto;
                 background-color: #ffffff;
-                border-radius: 12px;
+                border-radius: 16px;
                 overflow: hidden;
-                box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1), 0 2px 4px -1px rgba(0, 0, 0, 0.06);
+                box-shadow: 0 20px 25px -5px rgba(0, 0, 0, 0.1), 0 10px 10px -5px rgba(0, 0, 0, 0.04);
             }
             .header {
-                background-color: #0f172a;
-                padding: 32px 24px;
+                background: linear-gradient(135deg, #0f172a 0%, #1e293b 100%);
+                padding: 40px 24px;
                 text-align: center;
+                border-bottom: 4px solid #e11d48;
             }
             .header h1 {
-                color: #f8fafc;
+                color: #ffffff;
                 margin: 0;
-                font-size: 22px;
+                font-size: 20px;
                 font-weight: 800;
-                letter-spacing: -0.025em;
+                letter-spacing: 1px;
                 text-transform: uppercase;
             }
             .header p {
                 color: #94a3b8;
-                margin: 8px 0 0;
-                font-size: 13px;
-                font-weight: 500;
+                margin: 6px 0 0;
+                font-size: 11px;
+                font-weight: 600;
+                letter-spacing: 0.5px;
             }
             .content {
                 padding: 24px;
             }
             .news-card {
-                margin-bottom: 24px;
-                padding: 20px;
+                margin-bottom: 20px;
+                padding: 16px;
                 background-color: #ffffff;
-                border: 1px solid #e2e8f0;
-                border-radius: 8px;
-                transition: transform 0.2s ease;
+                border: 1px solid #f1f5f9;
+                border-radius: 12px;
+                box-shadow: 0 4px 6px -1px rgba(0,0,0,0.02);
             }
             .headline {
-                font-size: 17px;
+                font-size: 15px;
                 font-weight: 700;
                 color: #e11d48;
-                margin-bottom: 8px;
-                line-height: 1.4;
+                margin-bottom: 6px;
+                line-height: 1.3;
             }
             .summary {
-                font-size: 14px;
-                line-height: 1.6;
+                font-size: 13px;
+                line-height: 1.5;
                 color: #334155;
-                margin-bottom: 16px;
+                margin-bottom: 12px;
                 font-weight: 400;
             }
             .meta {
                 display: flex;
                 justify-content: space-between;
                 align-items: center;
-                border-top: 1px solid #f1f5f9;
-                padding-top: 12px;
-                font-size: 11px;
-                color: #64748b;
-                font-weight: 600;
+                padding-top: 10px;
+                border-top: 1px dashed #e2e8f0;
+                font-size: 10px;
+                color: #94a3b8;
+                font-weight: 700;
                 text-transform: uppercase;
             }
             .source-tag {
-                background-color: #f1f5f9;
-                padding: 4px 8px;
-                border-radius: 4px;
-                color: #475569;
+                color: #64748b;
             }
             .footer {
                 padding: 24px;
                 text-align: center;
-                background-color: #f1f5f9;
+                border-top: 1px solid #f1f5f9;
+                background-color: #f8fafc;
             }
             .footer p {
                 margin: 0;
-                font-size: 12px;
-                color: #64748b;
-                font-weight: 500;
+                font-size: 11px;
+                color: #94a3b8;
+                font-weight: 600;
             }
             @media only screen and (max-width: 600px) {
                 .container {
                     width: 100% !important;
-                    border-radius: 0 !important;
+                    border-radius: 12px !important;
                 }
-                .header {
-                    padding: 24px 16px;
-                }
-                .headline {
-                    font-size: 16px;
+                .wrapper {
+                    padding: 10px;
                 }
             }
         </style>
@@ -133,8 +128,8 @@ function generateEmailHTML(updates) {
         <div class="wrapper">
             <div class="container">
                 <div class="header">
-                    <h1>Iran vs Israel Updates</h1>
-                    <p>Taza Tareen AI Summaries • Roman Urdu Mein</p>
+                    <h1>War Updates Report</h1>
+                    <p>AI AGENT • TAZA TAREEN ROMAN URDU UPDATES</p>
                 </div>
                 <div class="content">
     `;
@@ -155,8 +150,8 @@ function generateEmailHTML(updates) {
     emailContent += `
                 </div>
                 <div class="footer">
-                    <p>Automated Update Agent • Node.js & Google Gemini</p>
-                    <p style="margin-top: 4px;">Date: 2026-03-12</p>
+                    <p>NODE.JS & GEMINI AI POWERED AGENT</p>
+                    <p style="margin-top: 4px; color: #64748b;">Date: ${today}</p>
                 </div>
             </div>
         </div>
