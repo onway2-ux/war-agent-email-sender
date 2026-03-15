@@ -7,6 +7,7 @@ export default function Dashboard() {
   const [config, setConfig] = useState<any>(null);
   const [loading, setLoading] = useState(true);
   const [saving, setSaving] = useState(false);
+  const [testing, setTesting] = useState(false);
   const [message, setMessage] = useState("");
 
   useEffect(() => {
@@ -46,6 +47,25 @@ export default function Dashboard() {
       setMessage("Error saving settings. ❌");
     }
     setSaving(false);
+  }
+
+  async function handleTest() {
+    setTesting(true);
+    setMessage("AI is aggregating news... 🤖");
+    try {
+      const res = await fetch('/api/test', { method: 'POST' });
+      const data = await res.json();
+      if (data.success) {
+        setMessage("Test email sent successfully! 📧");
+        fetchConfig(); // Refresh timestamp
+      } else {
+        setMessage(`Test failed: ${data.message || data.error} ❌`);
+      }
+    } catch (e) {
+      setMessage("Network error occurred. ❌");
+    }
+    setTesting(false);
+    setTimeout(() => setMessage(""), 5000);
   }
 
   const toggleHour = (hour: number) => {
@@ -181,10 +201,18 @@ export default function Dashboard() {
             <div className="space-y-3">
                <button
                 onClick={handleSave}
-                disabled={saving}
+                disabled={saving || testing}
                 className="w-full bg-rose-600 hover:bg-rose-500 disabled:opacity-50 text-white font-black uppercase tracking-widest py-5 rounded-2xl shadow-xl shadow-rose-950/20 transition-all active:scale-[0.98] text-xs"
               >
                 {saving ? "Processing..." : "Sync All Settings"}
+              </button>
+
+              <button
+                onClick={handleTest}
+                disabled={testing || saving}
+                className="w-full bg-slate-100 hover:bg-white disabled:opacity-50 text-slate-950 font-black uppercase tracking-widest py-5 rounded-2xl shadow-xl shadow-white/5 transition-all active:scale-[0.98] text-xs"
+              >
+                {testing ? "Running Test..." : "Run Manual Test"}
               </button>
               
               <button
