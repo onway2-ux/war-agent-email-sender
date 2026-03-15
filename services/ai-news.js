@@ -1,9 +1,9 @@
 require('dotenv').config();
 const axios = require('axios');
 
-async function getWarUpdates() {
+async function getWarUpdates(topic, language) {
     try {
-        console.log("Fetching latest news updates...");
+        console.log(`Fetching latest news updates for topic: ${topic} in ${language}...`);
         
         // Using the Google Gemini REST API (gemini-2.5-flash) with Search Grounding
         const response = await axios.post(
@@ -11,13 +11,13 @@ async function getWarUpdates() {
             {
                 "system_instruction": {
                     "parts": { 
-                        "text": "You are a highly accurate news aggregator reporting on the Iran vs Israel / US conflict. Your goal is to provide the most recent updates available. CRITICAL RULES: 1. You MUST write in easy-to-read Roman Urdu. 2. Keep the content very minimal and to the point (a short headline and a 1-sentence summary). 3. Always search for the absolute latest news available on the web regarding this conflict. Filter out any duplicates. Format the response strictly as a JSON array of objects. Each object must have exactly these keys: 'headline' (string in Roman Urdu), 'summary' (string in Roman Urdu), 'source' (string, name of the news outlet), and 'timestamp' (string, approximate time)." 
+                        "text": `You are a highly accurate news aggregator reporting on the ${topic}. Your goal is to provide the most recent updates available. CRITICAL RULES: 1. You MUST write in easy-to-read ${language}. 2. Keep the content very minimal and to the point (a short headline and a 1-sentence summary). 3. Always search for the absolute latest news available on the web regarding this topic. Filter out any duplicates. Format the response strictly as a JSON array of objects. Each object must have exactly these keys: 'headline' (string in ${language}), 'summary' (string in ${language}), 'source' (string, name of the news outlet), and 'timestamp' (string, approximate time).` 
                     }
                 },
                 "contents": [
                     {
                         "parts": [
-                            { "text": "Retrieve the top 5 absolute latest news updates on the Iran vs Israel / US conflict from today's web results. Output as JSON array." }
+                            { "text": `Retrieve the top 5 absolute latest news updates on the ${topic} from today's web results. Output as JSON array.` }
                         ]
                     }
                 ],
