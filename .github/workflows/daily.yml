@@ -2,12 +2,8 @@ name: Daily War Updates Email Agent
 
 on:
   schedule:
-    # 6:00 AM IST is 00:30 UTC
-    - cron: '30 0 * * *'
-    # 2:00 PM IST is 08:30 UTC
-    - cron: '30 8 * * *'
-    # 9:00 PM IST is 15:30 UTC
-    - cron: '30 15 * * *'
+    # Runs every hour to check the dynamic schedule in the database
+    - cron: '0 * * * *'
   workflow_dispatch: # Allows manual trigger for testing
 
 jobs:
@@ -31,4 +27,6 @@ jobs:
           GMAIL_USER: ${{ secrets.GMAIL_USER }}
           GMAIL_PASS: ${{ secrets.GMAIL_PASS }}
           GEMINI_API_KEY: ${{ secrets.GEMINI_API_KEY }}
+          SUPABASE_URL: ${{ secrets.SUPABASE_URL }}
+          SUPABASE_ANON_KEY: ${{ secrets.SUPABASE_ANON_KEY }}
         run: node index.js

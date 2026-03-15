@@ -18,10 +18,21 @@ async function main() {
             return;
         }
 
-        console.log(`Config loaded: Topic="${config.news_topic}", Lang="${config.language}"`);
+        console.log(`Config loaded: Topic="${config.news_topic}", Lang="${config.language}", Tone="${config.tone}"`);
 
-        // Step 2: Fetch the latest AI-summarized updates
-        const updates = await getWarUpdates(config.news_topic, config.language);
+        // 2. Dynamic Schedule Check
+        const currentHour = new Date().getHours(); // 0-23 in System time
+        const allowedHours = config.run_hours.split(',').map(h => parseInt(h.trim()));
+        
+        console.log(`Current Hour: ${currentHour}, Allowed Hours: ${allowedHours.join(', ')}`);
+        
+        if (!allowedHours.includes(currentHour)) {
+            console.log("Current hour is not in the allowed schedule. Skipping run.");
+            return;
+        }
+
+        // 3. Fetch the latest AI-summarized updates
+        const updates = await getWarUpdates(config.news_topic, config.language, config.tone);
 
         // Check if there are updates available
         if (!updates || updates.length === 0) {
@@ -31,10 +42,10 @@ async function main() {
 
         console.log(`Retrieved ${updates.length} top updates.`);
 
-        // Step 3: Format and send the email
-        await sendEmailUpdates(updates);
+        // 4. Format and send the email to recipients
+        await sendEmailUpdates(updates, config.receiver_emails);
 
-        // Step 4: Update last run status in DB
+        // 5. Update last run status in DB
         await updateLastRun();
 
         console.log("Agent run completed successfully.");

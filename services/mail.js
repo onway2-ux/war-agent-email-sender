@@ -162,8 +162,8 @@ function generateEmailHTML(updates) {
     return emailContent;
 }
 
-async function sendEmailUpdates(updates) {
-    console.log("Preparing to send email...");
+async function sendEmailUpdates(updates, recipients) {
+    console.log(`Preparing to send email to: ${recipients}...`);
     
     if (!updates || updates.length === 0) {
         console.log("No updates to send.");
@@ -174,8 +174,8 @@ async function sendEmailUpdates(updates) {
 
     const mailOptions = {
         from: `"War Updates Agent" <${process.env.GMAIL_USER}>`,
-        to: process.env.GMAIL_USER, // Sending to yourself, or modify if using a list
-        subject: `Latest Iran vs Israel/US Updates - ${new Date().toLocaleDateString()}`,
+        to: recipients, 
+        subject: `Latest Updates - ${new Date().toLocaleDateString()}`,
         html: htmlContent
     };
 

@@ -23,6 +23,9 @@ async function getBotConfig() {
             return {
                 news_topic: 'Iran vs Israel / US conflict',
                 language: 'Roman Urdu',
+                tone: 'Professional',
+                receiver_emails: 'muhammadsayban1123@gmail.com',
+                run_hours: '6,14,21',
                 is_active: true
             };
         }
@@ -33,6 +36,9 @@ async function getBotConfig() {
         return {
             news_topic: 'Iran vs Israel / US conflict',
             language: 'Roman Urdu',
+            tone: 'Professional',
+            receiver_emails: 'muhammadsayban1123@gmail.com',
+            run_hours: '6,14,21',
             is_active: true
         };
     }
