@@ -20,14 +20,21 @@ async function main() {
 
         console.log(`Config loaded: Topic="${config.news_topic}", Lang="${config.language}", Tone="${config.tone}"`);
 
-        // 2. Dynamic Schedule Check
-        const currentHour = new Date().getHours(); // 0-23 in System time
+        // 2. Dynamic Schedule Check (Accounting for Timezone)
+        const now = new Date();
+        const utcHour = now.getUTCHours();
+        // Default to PKT (UTC+5) as per user's location
+        const offset = 5; 
+        const currentHour = (utcHour + offset) % 24;
+        
         const allowedHours = config.run_hours.split(',').map(h => parseInt(h.trim()));
         
-        console.log(`Current Hour: ${currentHour}, Allowed Hours: ${allowedHours.join(', ')}`);
+        console.log(`System Time (UTC): ${utcHour}:00`);
+        console.log(`Target Time (PKT): ${currentHour}:00`);
+        console.log(`Allowed Hours (PKT): ${allowedHours.join(', ')}`);
         
         if (!allowedHours.includes(currentHour)) {
-            console.log("Current hour is not in the allowed schedule. Skipping run.");
+            console.log("Current hour (PKT) is not in the allowed schedule. Skipping run.");
             return;
         }
 
