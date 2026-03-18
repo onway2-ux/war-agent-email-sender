@@ -7,16 +7,20 @@ const supabaseUrl = process.env.NEXT_PUBLIC_SUPABASE_URL!;
 const supabaseKey = process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY!;
 const supabase = createClient(supabaseUrl, supabaseKey);
 
-export async function POST() {
+export async function POST(req: Request) {
     try {
+        const body = await req.json();
+        const configId = body.id || 1; // Default to ID 1 if not provided
+
         // 1. Fetch current config from Supabase
         const { data: config, error: configError } = await supabase
             .from('bot_config')
             .select('*')
+            .eq('id', configId)
             .single();
 
         if (configError || !config) {
-            throw new Error("Failed to fetch bot configuration");
+            throw new Error(`Failed to fetch bot configuration for ID ${configId}`);
         }
 
         console.log(`Manual Test Triggered: Topic="${config.news_topic}", Lang="${config.language}", Tone="${config.tone}"`);
@@ -39,7 +43,8 @@ export async function POST() {
 
         let updates = [];
         try {
-            const resultText = geminiResponse.data.candidates[0].content.parts[0].text;
+            const data = geminiResponse.data as any;
+            const resultText = data.candidates[0].content.parts[0].text;
             updates = JSON.parse(resultText);
             if (!Array.isArray(updates)) updates = updates.news || updates.updates || [];
         } catch (e) {

@@ -1,73 +1,78 @@
 require('dotenv').config();
 const { getWarUpdates } = require('./services/ai-news');
 const { sendEmailUpdates } = require('./services/mail');
-const { getBotConfig, updateLastRun } = require('./services/db');
+const { getAllActiveConfigs, updateLastRun } = require('./services/db');
+
+// Helper for delay to avoid API rate limits
+const sleep = (ms) => new Promise(resolve => setTimeout(resolve, ms));
 
 async function main() {
     console.log("----------------------------------------");
-    console.log(`Starting AI Agent at ${new Date().toLocaleString()}`);
+    console.log(`Starting AI Agent Engine at ${new Date().toLocaleString()}`);
     console.log("----------------------------------------");
 
     try {
-        // Step 1: Fetch Remote Config from Supabase
-        console.log("Fetching remote configuration...");
-        const config = await getBotConfig();
+        // Step 1: Fetch ALL Active Configs from Supabase
+        console.log("Fetching active news streams...");
+        const configs = await getAllActiveConfigs();
         
-        if (!config.is_active) {
-            console.log("Agent is disabled via Dashboard. Skipping run.");
+        if (configs.length === 0) {
+            console.log("No active news streams found. Exiting.");
             return;
         }
 
-        console.log(`Config loaded: Topic="${config.news_topic}", Lang="${config.language}", Tone="${config.tone}"`);
+        console.log(`Detected ${configs.length} active streams to process.`);
 
-        // 2. Dynamic Schedule Check (Accounting for Timezone)
-        const now = new Date();
-        const utcHour = now.getUTCHours();
-        // Default to PKT (UTC+5) as per user's location
-        const offset = 5; 
-        const currentHour = (utcHour + offset) % 24;
-        
-        const allowedHours = config.run_hours.split(',').map(h => parseInt(h.trim()));
-        
-        console.log(`System Time (UTC): ${utcHour}:00`);
-        console.log(`Target Time (PKT): ${currentHour}:00`);
-        console.log(`Allowed Hours (PKT): ${allowedHours.join(', ')}`);
-        
-        if (!allowedHours.includes(currentHour)) {
-            console.log("Current hour (PKT) is not in the allowed schedule. Skipping run.");
-            return;
+        for (const config of configs) {
+            console.log(`\n>> Processing Stream: "${config.news_topic}" (ID: ${config.id})`);
+            
+            try {
+                // 2. Dynamic Schedule Check (Accounting for Timezone)
+                const now = new Date();
+                const utcHour = now.getUTCHours();
+                const offset = 5; // PKT
+                const currentHour = (utcHour + offset) % 24;
+                
+                const allowedHours = config.run_hours.split(',').map(h => parseInt(h.trim()));
+                
+                console.log(`   - Time Info: UTC=${utcHour}:00 | PKT=${currentHour}:00 | Allowed=${config.run_hours}`);
+                
+                if (!allowedHours.includes(currentHour)) {
+                    console.log("   - [SKIP] Current hour is not scheduled for this stream.");
+                    continue;
+                }
+
+                // 3. Fetch AI-summarized updates
+                const updates = await getWarUpdates(config.news_topic, config.language, config.tone);
+
+                if (!updates || updates.length === 0) {
+                    console.log("   - [SKIP] No news updates found for this topic.");
+                    continue;
+                }
+
+                console.log(`   - [DONE] Retrieved ${updates.length} updates.`);
+
+                // 4. Send email
+                await sendEmailUpdates(updates, config.receiver_emails);
+
+                // 5. Update last run
+                await updateLastRun(config.id);
+                console.log("   - [SUCCESS] Stream processed completely.");
+
+                // Small delay between streams to avoid hitting AI/Mail quotas too fast
+                await sleep(2000);
+
+            } catch (innerError) {
+                console.error(`   - [ERROR] Failed to process stream "${config.news_topic}":`, innerError.message);
+            }
         }
 
-        // 3. Fetch the latest AI-summarized updates
-        const updates = await getWarUpdates(config.news_topic, config.language, config.tone);
-
-        // Check if there are updates available
-        if (!updates || updates.length === 0) {
-            console.log("No updates found today. Exiting.");
-            return;
-        }
-
-        console.log(`Retrieved ${updates.length} top updates.`);
-
-        // 4. Format and send the email to recipients
-        await sendEmailUpdates(updates, config.receiver_emails);
-
-        // 5. Update last run status in DB
-        await updateLastRun();
-
-        console.log("Agent run completed successfully.");
+        console.log("\n----------------------------------------");
+        console.log("AI Agent Engine: All streams processed.");
+        console.log("----------------------------------------");
 
     } catch (error) {
-        console.error("Critical error during agent execution:");
-        // Graceful error logging
-        if (error.response) {
-            console.error("- Status:", error.response.status);
-            console.error("- Response Data:", error.response.data);
-        } else {
-            console.error("- Message:", error.message);
-        }
-    } finally {
-        console.log("----------------------------------------");
+        console.error("Critical engine error:", error.message);
     }
 }
 
